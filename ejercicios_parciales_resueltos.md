@@ -9,7 +9,15 @@
 <details>
 <summary>Respuesta</summary>
 <p>
-<!-- Aquí va la respuesta -->
+
+La memoria virtual es la abstracción de la memoria física que permite a los procesos tener la ilusión de disponer de toda la memoria del sistema, cuando en realidad solo tienen acceso a una parte de ella. Los mecanismos más relevantes son:
+
+- **Base y Bound**: Asigna a cada proceso una sección de memoria contigua que comienza en la base y termina en base + bound. Si se intenta acceder a una dirección fuera de este rango, se produce un error.
+
+- **Tabla de Segmentos**: Divide la memoria en segmentos con base y bound. La tabla de segmentos contiene la base, el límite y los permisos de cada segmento.
+
+- **Paginación**: Divide la memoria en bloques de tamaño fijo llamados páginas. Cada proceso accede a la memoria a través de direcciones virtuales que son traducidas a direcciones físicas mediante tablas de páginas, que contienen la dirección física de cada página. Para mejorar el rendimiento, es posible utilizar una TLB (Translation Lookaside Buffer) que almacena las traducciones más frecuentes.
+
 </p>
 </details>
 
@@ -18,7 +26,13 @@
 <details>
 <summary>Respuesta</summary>
 <p>
-<!-- Aquí va la respuesta -->
+
+Para el mecanismo de memoria paginada de tres niveles se tiene un mecanismo similar al de 2 niveles, pero con una tabla de páginas adicional.
+
+# TODO : insertar esquema
+
+Como la dirección virtual es de 32 bits, se tiene 2^32 direcciones posibles.
+
 </p>
 </details>
 
@@ -127,31 +141,53 @@ Entonces, mappeados:
 
 ### La siguiente es una representación del espacio de direcciones virtual de un proceso. La tabla representa la totalidad de las secciones del espacio de direcciones virtual de 32 bits.
 
-<details>
-<summary>Respuesta</summary>
-<p>
-<!-- Aquí va la respuesta -->
-</p>
-</details>
+| Sección | Tamaño en páginas de 4K |
+|---------|-------------------------|
+| Trampoline | 1 |
+| Stack | 512 |
+| Sin asignar | ? |
+| Heap | 1024 |
+| Data | 20 |
+| Text | 768 |
 
 #### Redacción de la tabla que abarca todo el espacio de direcciones virtual. ¿Cuánto ocupa en cantidad de páginas del espacio sin asignar (en regiones)?
-#### Cuántas frames de memoria física son necesarias para mapear este espacio (no considere en este punto las tablas de páginas, solo las frames asignadas).
-#### Cuántas tablas de páginas en un esquema x86 de 2 niveles de paginado son necesarias para mapear este espacio de direcciones.
-
-```
-Sección      Tamaño en páginas de 4K
-Trampoline   1
-Stack        512
-Sin asignar  7
-Heap         1024
-Data         20
-Text         768
-```
 
 <details>
 <summary>Respuesta</summary>
 <p>
-<!-- Aquí va la respuesta -->
+
+El espacio total de direcciones virtuales en un sistema de 32 bits es de 2^32 bytes, que equivale a 2^32 / 4096 = 2^20 páginas de 4K.
+
+La cantidad de páginas asignadas es de 1 + 512 + 1024 + 20 + 768 = 2325 páginas.
+
+La cantidad de páginas sin asignar es entonces de 2^20 - 2325 = 1048576 - 2325 = 1046251 páginas.
+
+</p>
+</details> 
+
+#### Cuántas frames de memoria física son necesarias para mapear este espacio (no considere en este punto las tablas de páginas, solo las frames asignadas).
+
+<details>
+<summary>Respuesta</summary>
+<p>
+
+# Chequear respuesta
+
+Cada sección que está asignada necesita ser mappeada a un frame de memoria física. Por lo tanto, se necesitan 2325 frames de memoria física.
+
+</p>
+</details> 
+
+#### Cuántas tablas de páginas en un esquema x86 de 2 niveles de paginado son necesarias para mapear este espacio de direcciones.
+
+<details>
+<summary>Respuesta</summary>
+<p>
+
+Suponiendo direcciones virtuales con la siguiente forma: 10 bits para el índice de la tabla de nivel 1, 10 bits para el índice de la tabla de páginas de nivel 2 y 12 bits para el offset, cada tabla de páginas puede contener hasta 1024 entradas.
+
+Por lo tanto, se necesitan 2325 / 1024 = 3 tablas de páginas.
+
 </p>
 </details>
 
