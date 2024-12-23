@@ -21,21 +21,6 @@ La memoria virtual es la abstracción de la memoria física que permite a los pr
 </p>
 </details>
 
-### Explicar el mecanismo de address translation **memoria virtual paginada** de tres niveles de indirección de 32 bits. Indique la cantidad de direcciones de memoria que provee, una virtual address: [7 bits, 7 bits, 6 bits, 12 bits] con tablas de registros de 4 bytes.
-
-<details>
-<summary>Respuesta</summary>
-<p>
-
-Para el mecanismo de memoria paginada de tres niveles se tiene un mecanismo similar al de 2 niveles, pero con una tabla de páginas adicional.
-
-# TODO : insertar esquema
-
-Como la dirección virtual es de 32 bits, se tiene 2^32 direcciones posibles.
-
-</p>
-</details>
-
 ### Describa cómo fue variando la estructura del address space respecto la memoria física en: base y bound, tabla de registros y paginación. Explique con diagramas.
 
 <details>
@@ -57,6 +42,21 @@ La paginación divide la memoria en bloques de tamaño fijo llamados páginas. C
 </p>
 </details>
 
+### Explicar el mecanismo de address translation **memoria virtual paginada** de tres niveles de indirección de 32 bits. Indique la cantidad de direcciones de memoria que provee, una virtual address: [7 bits, 7 bits, 6 bits, 12 bits] con tablas de registros de 4 bytes.
+
+<details>
+<summary>Respuesta</summary>
+<p>
+
+Para el mecanismo de memoria paginada de tres niveles se tiene un mecanismo similar al de 2 niveles, pero con una tabla de páginas adicional.
+
+!TODO: insertar esquema
+
+Como la dirección virtual es de 32 bits, se tiene 2^32 direcciones posibles.
+
+</p>
+</details>
+
 ### Dado el siguiente esquema, explique cómo se realizan las traducciones recorriendo el arreglo en un modelo de memoria virtual con TLB y paginación de dos niveles. En el mismo esquema, especifique cuántos miss, hit, accesos a memoria y traducciones hay.
 
 ![Esquema TLB y paginación](imagenes/1.png)
@@ -72,6 +72,7 @@ Determine si son verdaderos o falsos:
 <details>
 <summary>Respuesta</summary>
 <p>
+
 - Hay 3 hits y 7 miss en la TLB.
 Falso, hay 7 hits y 3 miss.
 - Hay 10 accesos a memoria.
@@ -108,6 +109,7 @@ Traducir las siguientes direcciones virtuales a físicas:
 <details>
 <summary>Respuesta</summary>
 <p>
+
 Vamos a pasar a binario las direcciones virtuales y a separarlas en segment number, page number y offset.
 
 | Dirección Virtual | Binario | Segment Number | Page Number | Offset |
@@ -196,6 +198,7 @@ Por lo tanto, se necesitan 2325 / 1024 = 3 tablas de páginas.
 <details>
 <summary>Respuesta</summary>
 <p>
+
 48 bits implica que existen 2^48 direcciones posibles. Asumiendo que cada dirección es de 1 byte, se pueden almacenar 2^48 bytes, lo que equivale a 2^48 / 1024 Kbytes = 2^38 Kbytes.
 
 ![Estructura paginación multinivel](imagenes/paginacion_multitabla.png)
@@ -213,7 +216,9 @@ Pasos:
 <details>
 <summary>Respuesta</summary>
 <p>
+
 <!-- Aquí va la respuesta -->
+
 </p>
 </details>
 
@@ -223,6 +228,7 @@ El arreglo se recorre completamente, accediendo a cada elemento una vez. En este
 <details>
 <summary>Respuesta</summary>
 <p>
+
 Como el arreglo tiene 50000 enteros y cada entero ocupa 4 bytes, el arreglo ocupa 200000 bytes.
 
 El arreglo comienza en la dirección virtual 0x01FBD000, que en binario es 0000 0001 1111 1011 1101 0000 0000 0000. Esto nos permite simplificar el cálculo de las páginas necesarias, ya que el offset es 0 y ocupa toda la primera página. Si no fuese así, habría que calcular dónde termina el arreglo para saber cuántas páginas se necesitan para almacenarlo.
@@ -245,6 +251,7 @@ Finalmente, necesitamos 51 páginas distintas para acceder a todos los elementos
 <details>
 <summary>Respuesta</summary>
 <p>
+
 Esta respuesta puede no estar correcta.
 
 Primero utilizamos un superbloque.
@@ -258,6 +265,7 @@ Quedan 2047 bloques para inodos y datos. Por cada bloque de inodo, podemos tener
 De esta forma tenemos 1 superbloque, 1 bitmap de inodos, 1 bitmap de bloques, 121 bloques de inodos y 1925 bloques de datos: que suman 2049 bloques.
 
 Los bitmaps de un bloque son ambos suficientes.
+
 </p>
 </details>
 
@@ -298,7 +306,9 @@ Asuma que los procesos no terminan.
 <details>
 <summary>Respuesta</summary>
 <p>
+
 <!-- Aquí va la respuesta -->
+
 </p>
 </details>
 
@@ -335,7 +345,9 @@ void scheduler() {
 <details>
 <summary>Respuesta</summary>
 <p>
+
 <!-- Aquí va la respuesta -->
+
 </p>
 </details>
 
@@ -361,6 +373,7 @@ e. La PCB entry debe ser guardada, es todo lo necesario para poder restaurar el 
 <details>
 <summary>Respuesta</summary>
 <p>
+
 MLFQ (Multi-Level Feedback Queue) es una política de scheduling que divide los procesos en diferentes colas con diferentes prioridades. Los procesos se mueven entre las colas basándose en su tiempo de ejecución: los procesos nuevos y los procesos I/O-bound se colocan en la cola de mayor prioridad, y cada vez que un proceso consume su quantum de tiempo sin completarse, se mueve a una cola de prioridad inferior. Esto permite mayor responsividad ante políticas como Round-Robin y evita que un proceso ocupe la CPU indefinidamente o que un proceso espere indefinidamente por la CPU, que podría pasar en políticas como FIFO.
 
 Un ejemplo de MLFQ sería el siguiente:
@@ -378,6 +391,7 @@ Un ejemplo de MLFQ sería el siguiente:
 <details>
 <summary>Respuesta</summary>
 <p>
+
 El Completely Fair Scheduler de Linux elige el proceso con menor virtual runtime para correr siguiente después de un context switch. El runtime también toma en cuenta el Niceness del proceso, que es análogo a la prioridad de un proceso. Puede tomar valores de -20 a 19, y el runtime es recalculado dividiendo el runtime actual por el niceness. Internamente el CFS utiliza un árbol rojo-negro para mantener los procesos ordenados por virtual runtime de forma eficiente.
 
 Por otro lado, tiene los siguientes atributos: min_granularity que indica el tiempo mínimo que un proceso puede correr a la vez, y sched_latency, que es el tiempo que el scheduler desea repartir en cada iteración.
@@ -392,6 +406,7 @@ Por otro lado, tiene los siguientes atributos: min_granularity que indica el tie
 <details>
 <summary>Respuesta</summary>
 <p>
+
 Un proceso abstrae la ejecución de un programa, incluyendo su estado, recursos y contexto de ejecución. El proceso tiene:
 - Text: Código del programa.
 - Data: Variables globales y estáticas.
@@ -409,6 +424,7 @@ Para crear la ilusión de que dispone de toda la memoria del sistema, se utiliza
 <details>
 <summary>Respuesta</summary>
 <p>
+
 El kernel utiliza la memoria virtual y los modos de ejecución del procesador para garantizar el aislamiento entre procesos. La memoria virtual permite a cada proceso tener su propio espacio de direcciones, que es traducido a direcciones físicas por el kernel. Los modos de ejecución del procesador permiten que ciertas instrucciones (las privilegiadas) solo puedan ser ejecutadas en modo kernel, evitando que los procesos puedan acceder a recursos críticos del sistema.
 
 La memoria virtual necesita que el hardware disponga de un MMU (Memory Management Unit) que realice las traducciones de direcciones virtuales a físicas, y los modos de ejecución necesitan que el procesador soporte modos de ejecución privilegiados y no privilegiados.
@@ -421,6 +437,7 @@ La memoria virtual necesita que el hardware disponga de un MMU (Memory Managemen
 <details>
 <summary>Respuesta</summary>
 <p>
+
 El stack es la región del espacio de direcciones que se utiliza para almacenar variables locales, argumentos de funciones, direcciones de retorno, etc. Para esto, es posible utilizar las instrucciones push y pop para agregar y quitar elementos del stack, o bien manipular directamente el puntero de pila que apunta el tope del stack.
 
 Para el caso de función read:
@@ -442,6 +459,7 @@ Para el caso de función read:
 <details>
 <summary>Respuesta</summary>
 <p>
+
 El address space es el rango de direcciones de memoria que un proceso puede acceder y utilizar durante su ejecución. Está compuesto por text, data(variables estáticas y globales), heap (memoria dinámica) y stack (variables locales y llamadas a funciones). Sirve para que cada proceso tenga su propio espacio de direcciones y no pueda acceder a la memoria de otros procesos. Si se desease compartir memoria entre procesos, se puede utilizar memoria compartida a la que un proceso puede acceder según sus permisos.
 
 Para crear procesos en Unix, se utiliza la syscall fork, que crea un proceso hijo idéntico al proceso padre copiando todo su espacio de direcciones, y exec, que reemplaza la imagen del proceso actual con un nuevo programa. La syscall fork devuelve 2 process IDs, el PID del proceso hijo para el padre y 0 para el proceso hijo. Wait se utiliza para esperar la finalización de un proceso hijo desde el proceso padre.
@@ -493,9 +511,13 @@ De modo Kernel a modo usuario:
 <details>
 <summary>Respuesta</summary>
 <p>
+
 Un proceso zombie es un proceso que ha terminado su ejecución pero que aún tiene una entrada en la tabla de procesos del kernel. Esto se produce porque el kernel necesita mantener la entrada en la tabla de procesos para que el proceso padre pueda obtener el estado de salida del proceso hijo. Para solucionarlo, el proceso padre debe llamar a la syscall wait para obtener el estado de salida del proceso hijo y permitir que el kernel libere la entrada en la tabla de procesos.
 
 Un proceso huérfano es un proceso cuyo proceso padre ha terminado su ejecución, por lo que no tiene un padre que sea capaz de obtener su estado de salida y liberarlo. Para solucionarlo, el kernel asigna como padre del proceso huérfano al proceso init, que se encarga de esperar a los procesos huérfanos y liberar sus recursos.
+
+</p>
+</details>
 
 ### Escriba un programa en C que permita jugar a dos procesos al ping pong, la pelota es un entero, cada vez que un proceso recibe la pelota debe incrementar en 1 su valor. Se corta por overflow o cambio de signo.
 
@@ -576,7 +598,6 @@ int main(void) {
 3. Timer Interrupts: Soportar un temporizador en hardware que pueda generar interrupciones periódicas para que el kernel pueda recuperar el control sea cual sea el estado del sistema.
 
 4. Protección de Memoria:  Soporte de hardware para separar y proteger áreas de memoria utilizadas por diferentes procesos.
-
 </p>
 </details>
 
@@ -712,6 +733,7 @@ int main(void) {
 <details>
 <summary>Respuesta</summary>
 <p>
+
 Entre threads de un mismo programa se comparten:
 - Stack Segment
 - File descriptors
@@ -767,6 +789,7 @@ En Linux no existe una distinción clara entre procesos e hilos, llamándose amb
 <details>
 <summary>Respuesta</summary>
 <p>
+
 mkdir /dir  /dir/s
 echo 'hola' > /dir/x
 echo 'mundo' > /dir/s/y
@@ -846,6 +869,7 @@ Entonces, se accede a 7 inodos y 7 bloques de datos.
 <details>
 <summary>Respuesta</summary>
 <p>
+
 mkdir /dir /dir/s /dir/s/w
 touch /dir/x /dir/s/y
 
@@ -914,6 +938,7 @@ Entonces, se accede a 7 inodos y 7 bloques de datos.
 <details>
 <summary>Respuesta</summary>
 <p>
+
 El inodo contiene metadata y punteros directos e indirectos a los bloques de datos, entre los cuales se presentan los siguientes:
 
 - mode: permisos del archivo
@@ -942,7 +967,9 @@ El inodo contiene metadata y punteros directos e indirectos a los bloques de dat
 <details>
 <summary>Respuesta</summary>
 <p>
+
 <!-- Aquí va la respuesta -->
+
 </p>
 </details>
 
@@ -951,7 +978,12 @@ El inodo contiene metadata y punteros directos e indirectos a los bloques de dat
 <details>
 <summary>Respuesta</summary>
 <p>
-<!-- Aquí va la respuesta -->
+
+- **Hard link**: Es una referencia directa a un inodo, lo que significa que el archivo original y el hard link son indistinguibles.
+- **Symbolic link**: Es un archivo que contiene la ruta de otro archivo.
+
+La ventaja de los hard links es que no se rompen al mover o renombrar el archivo original, mientras que la ventaja de los symbolic links es que pueden apuntar a archivos en diferentes sistemas de archivos. Además, los symbolic links pueden apuntar a directorios.
+
 </p>
 </details>
 
@@ -960,6 +992,7 @@ El inodo contiene metadata y punteros directos e indirectos a los bloques de dat
 <details>
 <summary>Respuesta</summary>
 <p>
+
 El Virtual File System es una abstracción que proporciona al sistema operativo una API independiente del hardware de almacenamiento. Los componentes de VFS son:
 
 - Superbloque: contiene información sobre el sistema de archivos, como el tamaño de los bloques, el tamaño de los inodos, dónde comienzan los bloques de inodos o datos, etc.
@@ -975,6 +1008,7 @@ El Virtual File System es una abstracción que proporciona al sistema operativo 
 <details>
 <summary>Respuesta</summary>
 <p>
+
 root
 └── home
     └── darthmendez
@@ -1003,7 +1037,9 @@ Estructuras mencionadas:
 <details>
 <summary>Respuesta</summary>
 <p>
+
 <!-- Aquí va la respuesta -->
+
 </p>
 </details>
 
@@ -1016,7 +1052,10 @@ Estructuras mencionadas:
 <details>
 <summary>Respuesta</summary>
 <p>
-<!-- Aquí va la respuesta -->
+
+- **Spin lock**: Un spin lock es un mecanismo de bloqueo que consiste en un bucle que espera activamente hasta que el recurso esté disponible. Es útil cuando se espera que el recurso esté disponible rápidamente y no se quiere cambiar de contexto.
+- **Sleep lock**: Un sleep lock es un mecanismo de bloqueo que pone al proceso en espera hasta que el recurso esté disponible. Es útil cuando se espera que el recurso esté disponible en un tiempo largo y no se quiere consumir CPU innecesariamente.
+
 </p>
 </details>
 
@@ -1033,7 +1072,11 @@ void spin_lock(int* lock) {
 <details>
 <summary>Respuesta</summary>
 <p>
-<!-- Aquí va la respuesta -->
+
+La implementación no es correcta ya que tiene problemas de atomicidad: como la verificación y la asignación no se hacen en una sola operación atómica, dos hilos pueden leer simultáneamente el valor de lock y luego asignarle el valor 1, rompiendo la exlusión mutua del spinlock. Además, el bucle se encuentra en un estado busy-waiting ya que en la linea de while se verifica la condición constantemente.
+
+!TODO: Nuevo código
+
 </p>
 </details>
 
@@ -1042,6 +1085,7 @@ void spin_lock(int* lock) {
 <details>
 <summary>Respuesta</summary>
 <p>
+
 El deadlock hace referencia a la situación en donde dos o más procesos se encuentran bloqueados indefinidamente esperando por un recurso del otro, dado que para liberar dichos recursos, necesitan de los recursos que el otro proceso tiene.
 
 Ejemplo 1:
@@ -1069,7 +1113,22 @@ void add(int incremento) {
 <details>
 <summary>Respuesta</summary>
 <p>
-<!-- Aquí va la respuesta -->
+
+La implementación no es correcta ya que tiene problemas de concurrencia: si dos hilos leen el saldo al mismo tiempo, incrementan el saldo y lo escriben, se puede perder una actualización. Para solucionarlo, se puede utilizar un mecanismo de bloqueo, como un mutex, para asegurar la exclusión mutua.
+
+```c
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+
+void add(int incremento) {
+    pthread_mutex_lock(&mutex);
+    int v;
+    v = cuenta_leer_saldo();
+    v += incremento;
+    cuenta_escribir_saldo(v);
+    pthread_mutex_unlock(&mutex);
+}
+```
+
 </p>
 </details>
 
@@ -1087,7 +1146,9 @@ d. La TLB almacena las tablas de páginas más frecuentemente utilizadas, reduci
 <details>
 <summary>Respuesta</summary>
 <p>
-<!-- Aquí va la respuesta -->
+
+Respuesta correcta: b. La TLB almacena las traducciones de direcciones virtuales a físicas más frecuentemente utilizadas, reduciendo la necesidad de acceder a las tablas de páginas en la memoria principal.
+
 </p>
 </details>
 
@@ -1101,7 +1162,9 @@ d. La separación permite al kernel proteger la privacidad de los datos, y el ac
 <details>
 <summary>Respuesta</summary>
 <p>
-<!-- Aquí va la respuesta -->
+
+Respuesta correcta: a. La separación protege al kernel de posibles errores en aplicaciones de usuario, y el acceso se permite mediante llamadas al sistema que validan las solicitudes antes de ejecutar operaciones privilegiadas.
+
 </p>
 </details>
 
@@ -1115,7 +1178,24 @@ d. `malloc` intercambia el contenido del heap con la memoria secundaria (disco) 
 <details>
 <summary>Respuesta</summary>
 <p>
-<!-- Aquí va la respuesta -->
+
+Respuesta correcta: c. `malloc` amplía el heap solicitando más memoria al sistema mediante la llamada `sbrk` o `mmap`, ajustando así el tamaño del espacio de memoria disponible dinámicamente.
+
+</p>
+</details>
+
+### ¿Qué estructura de datos utiliza el CFS (Completely Fair Scheduler de Linux) para mantener el orden de ejecución de las tareas?  
+a. Cola FIFO  
+b. Árbol AVL (Adelson-Velsky and Landis)  
+c. Árbol Rojo-Negro  
+d. Lista doblemente enlazada  
+
+<details>
+<summary>Respuesta</summary>
+<p>
+
+Respuesta correcta: c. Árbol Rojo-Negro
+
 </p>
 </details>
 
@@ -1129,20 +1209,9 @@ d. Divide procesos en grupos y asigna CPU proporcional al tamaño de cada grupo.
 <details>
 <summary>Respuesta</summary>
 <p>
-<!-- Aquí va la respuesta -->
-</p>
-</details>
 
-### ¿Qué estructura de datos utiliza el CFS (Completely Fair Scheduler de Linux) para mantener el orden de ejecución de las tareas?  
-a. Cola FIFO  
-b. Árbol AVL (Adelson-Velsky and Landis)  
-c. Árbol Rojo-Negro  
-d. Lista doblemente enlazada  
+Respuesta correcta: c. Permite actualizar el proceso con menor tiempo de ejecución virtual en tiempo logarítmico, permitiendo así encontrarlo y seleccionarlo rápidamente durante un cambio de contexto.  
 
-<details>
-<summary>Respuesta</summary>
-<p>
-<!-- Aquí va la respuesta -->
 </p>
 </details>
 
@@ -1155,7 +1224,9 @@ d. superblock
 <details>
 <summary>Respuesta</summary>
 <p>
-<!-- Aquí va la respuesta -->
+
+Respuesta correcta: c. file
+
 </p>
 </details>
 
@@ -1168,7 +1239,9 @@ d. Pila (stack)
 <details>
 <summary>Respuesta</summary>
 <p>
-<!-- Aquí va la respuesta -->
+
+Respuesta correcta: c. Lista enlazada
+
 </p>
 </details>
 
@@ -1186,7 +1259,9 @@ d. 1 → 2 → 4 → 3: El propósito principal es ejecutar la operación del ke
 <details>
 <summary>Respuesta</summary>
 <p>
+
 Respuesta correcta: a. 1 → 3 → 2 → 4: El propósito principal es asegurar que los parámetros sean válidos antes de ejecutar la operación del kernel.
+
 </p>
 </details>
 
@@ -1199,7 +1274,9 @@ d. Es un problema que solo ocurre en sistemas de tiempo real debido a la necesid
 <details>
 <summary>Respuesta</summary>
 <p>
-<!-- Aquí va la respuesta -->
+
+Respuesta correcta: b. Es una situación en la que el resultado del programa depende del orden no controlado de la ejecución de hilos o procesos.
+
 </p>
 </details>
 
@@ -1212,20 +1289,9 @@ d. Los sistemas monolíticos son más adecuados para dispositivos embebidos, mie
 <details>
 <summary>Respuesta</summary>
 <p>
-<!-- Aquí va la respuesta -->
-</p>
-</details>
 
-### ¿Cuál de las siguientes afirmaciones describe mejor el propósito y funcionamiento de la Translation Lookaside Buffer (TLB) en un sistema de memoria virtual?  
-a. La TLB almacena copias de datos de la memoria principal para reducir los tiempos de acceso, similar a una caché de CPU.  
-b. La TLB es una caché especial en la unidad de gestión de memoria (MMU) que almacena las traducciones de direcciones virtuales a físicas más frecuentemente utilizadas, reduciendo la necesidad de acceder a las tablas de páginas en la memoria principal.  
-c. La TLB gestiona la distribución de páginas de memoria entre múltiples procesos, asegurando que cada proceso reciba una cantidad equitativa de memoria física.  
-d. La TLB es una tabla en la memoria principal que almacena información sobre la correspondencia entre páginas (de direcciones virtuales) y frames (de direcciones físicas).  
+Respuesta correcta: c. Los sistemas monolíticos ejecutan todos los componentes del sistema operativo en el espacio del kernel, mientras que los microkernels ejecutan la mayoría de los servicios del sistema operativo en el espacio de usuario.
 
-<details>
-<summary>Respuesta</summary>
-<p>
-<!-- Aquí va la respuesta -->
 </p>
 </details>
 
@@ -1238,7 +1304,9 @@ d. MLFQ asigna siempre el quantum de tiempo más largo disponible al proceso int
 <details>
 <summary>Respuesta</summary>
 <p>
-<!-- Aquí va la respuesta -->
+
+Respuesta correcta: b. MLFQ divide los procesos con diferentes niveles de prioridad, y los procesos se mueven entre las colas basándose en su comportamiento y tiempo de ejecución, adaptándose a las necesidades de los procesos.
+
 </p>
 </details>
 
@@ -1252,7 +1320,9 @@ d. Un descriptor de archivo almacena la ubicación física de un archivo en disc
 <details>
 <summary>Respuesta</summary>
 <p>
-<!-- Aquí va la respuesta -->
+
+Respuesta correcta: b. Un descriptor de archivo es un índice en una tabla que gestiona el sistema operativo, permitiendo a un proceso realizar operaciones de lectura/escritura sobre un archivo abierto.
+
 </p>
 </details>
 
@@ -1266,7 +1336,9 @@ d. Planificación basada en eventos.
 <details>
 <summary>Respuesta</summary>
 <p>
-<!-- Aquí va la respuesta -->
+
+Respuesta correcta: c. Planificación por turnos con un quantum.
+
 </p>
 </details>
 
@@ -1280,7 +1352,9 @@ d. Su estado permanece en un "daemon" y se mantiene activo.
 <details>
 <summary>Respuesta</summary>
 <p>
-<!-- Aquí va la respuesta -->
+
+Respuesta correcta: a. Su entrada en la tabla de procesos se libera completamente una vez que el proceso padre lee el estado de salida del proceso hijo.
+
 </p>
 </details>
 
@@ -1294,7 +1368,9 @@ d. Realiza desfragmentación periódica del sistema de archivos durante el tiemp
 <details>
 <summary>Respuesta</summary>
 <p>
-<!-- Aquí va la respuesta -->
+
+Respuesta correcta: b. Almacena partes del sistema de archivos en la memoria para acceder repetidamente al disco por la misma información.
+
 </p>
 </details>
 
@@ -1308,7 +1384,9 @@ d. El "vruntime" se mantiene constante para todas las tareas; es importante porq
 <details>
 <summary>Respuesta</summary>
 <p>
+
 Respuesta correcta: a. El "vruntime" se incrementa en función del tiempo de ejecución real de la tarea y de la carga del sistema; es importante porque ayuda a mantener la equidad en la asignación de CPU.
+
 </p>
 </details>
 
@@ -1322,7 +1400,9 @@ d. Es una estructura lógica que organiza, gestiona y almacena archivos en dispo
 <details>
 <summary>Respuesta</summary>
 <p>
+
 Respuesta correcta: c. Abstraer las operaciones del sistema de archivos y permitir la coexistencia de múltiples sistemas de archivos.
+
 </p>
 </details>
 
@@ -1336,7 +1416,9 @@ d. malloc es más rápido que brk porque no requiere llamadas al sistema.
 <details>
 <summary>Respuesta</summary>
 <p>
+
 Respuesta correcta: b. malloc proporciona una abstracción más alta que incluye gestión de memoria, reutilización de bloques libres, y manejo de fragmentación, lo cual no es directamente manejado por brk.
+
 </p>
 </details>
 
@@ -1350,7 +1432,9 @@ d. Fragmentación de memoria: puede ser mitigado utilizando memoria dinámica me
 <details>
 <summary>Respuesta</summary>
 <p>
+
 Respuesta correcta: c. Condición de carrera (race condition): puede ser mitigado utilizando mecanismos de sincronización como mutexes o locks.
+
 </p>
 </details>
 
@@ -1364,7 +1448,9 @@ d. Referee: Asegura que todas las aplicaciones se ejecuten en tiempo real; Ilusi
 <details>
 <summary>Respuesta</summary>
 <p>
+
 Respuesta correcta: a. Referee: Gestiona el acceso a recursos compartidos para evitar conflictos; Ilusionista: Crea la ilusión de recursos dedicados y abundantes; Pegamento: Facilita la comunicación y coordinación entre aplicaciones.
+
 </p>
 </details>
 
@@ -1378,7 +1464,9 @@ d. fork inicia un nuevo programa especificado por el proceso llamante, cargando 
 <details>
 <summary>Respuesta</summary>
 <p>
+
 Respuesta correcta: b. fork duplica el proceso llamante, creando un nuevo proceso hijo con un espacio de direcciones independiente pero idéntico al del proceso padre en el momento de la llamada.
+
 </p>
 </details>
 
@@ -1392,6 +1480,8 @@ d. COW desactiva la paginación de memoria para los procesos hijo, permitiendo u
 <details>
 <summary>Respuesta</summary>
 <p>
+
 Respuesta correcta: b. COW posterga la creación de copias duplicadas de los datos en memoria hasta que uno de los procesos intenta modificar los datos, optimizando el uso de memoria.
+
 </p>
 </details>
