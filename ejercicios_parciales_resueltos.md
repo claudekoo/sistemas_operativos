@@ -207,7 +207,7 @@ Por lo tanto, se necesitan 2325 / 1024 = 3 tablas de páginas.
 </details>
 
 ### Dado un espacio de direcciones virtuales con direcciones de 8 bits y páginas de 16 bytes, asume un array de 12 elementos (cada uno de 4 bytes) comenzando en la dirección virtual 100.  
-Calcula el patrón de aciertos y fallos en la TLB cuando se accede a todos los elementos del array en un bucle. Asume que inicialmente, la TLB está vacía.  
+Calcular el patrón de aciertos y fallos en la TLB cuando se accede a todos los elementos del array en un bucle. Asume que inicialmente, la TLB está vacía.  
 
 Pasos:  
 - Determina el VPN y el desplazamiento para cada elemento del array.  
@@ -217,6 +217,7 @@ Pasos:
 <summary>Respuesta</summary>
 <p>
 
+!TODO:
 <!-- Aquí va la respuesta -->
 
 </p>
@@ -251,8 +252,6 @@ Finalmente, necesitamos 51 páginas distintas para acceder a todos los elementos
 <details>
 <summary>Respuesta</summary>
 <p>
-
-Esta respuesta puede no estar correcta.
 
 Primero utilizamos un superbloque.
 
@@ -307,6 +306,7 @@ Asuma que los procesos no terminan.
 <summary>Respuesta</summary>
 <p>
 
+!TODO:
 <!-- Aquí va la respuesta -->
 
 </p>
@@ -346,6 +346,7 @@ void scheduler() {
 <summary>Respuesta</summary>
 <p>
 
+!TODO:
 <!-- Aquí va la respuesta -->
 
 </p>
@@ -968,7 +969,40 @@ El inodo contiene metadata y punteros directos e indirectos a los bloques de dat
 <summary>Respuesta</summary>
 <p>
 
-<!-- Aquí va la respuesta -->
+root
+└── home
+    └── sisops
+        ├── a.file
+        ├── b.hardlink
+        └── c.softlink
+
+**cat /home/sisops/a**
+1. inodo root → bloque de datos con dentry (“home”, inodo)
+2. inodo home → bloque de datos con dentry (“sisops”, inodo)
+3. inodo sisops → bloque de datos con dentry (“a”, inodo ; “b”, inodo ; “c”, inodo)
+4. inodo a → bloque de datos con el contenido “Hola mundo”
+
+Entonces, se accede a 4 inodos y 4 bloques de datos.
+
+**cat /home/sisops/b**
+1. inodo root → bloque de datos con dentry (“home”, inodo)
+2. inodo home → bloque de datos con dentry (“sisops”, inodo)
+3. inodo sisops → bloque de datos con dentry (“a”, inodo ; “b”, inodo ; “c”, inodo)
+4. inodo b = inodo a → bloque de datos con el contenido “Hola mundo”
+
+Entonces, se accede a 4 inodos y 4 bloques de datos.
+
+**cat /home/sisops/c**
+1. inodo root → bloque de datos con dentry (“home”, inodo)
+2. inodo home → bloque de datos con dentry (“sisops”, inodo)
+3. inodo sisops → bloque de datos con dentry (“a”, inodo ; “b”, inodo ; “c”, inodo)
+4. inodo c → bloque de datos con el path /home/sisops/b
+5. inodo root → bloque de datos con dentry (“home”, inodo)
+6. inodo home → bloque de datos con dentry (“sisops”, inodo)
+7. inodo sisops → bloque de datos con dentry (“a”, inodo ; “b”, inodo ; “c”, inodo)
+8. inodo b = inodo a → bloque de datos con el contenido “Hola mundo”
+
+Entonces, se accede a 8 inodos y 8 bloques de datos.
 
 </p>
 </details>
@@ -1038,7 +1072,28 @@ Estructuras mencionadas:
 <summary>Respuesta</summary>
 <p>
 
-<!-- Aquí va la respuesta -->
+Los componentes de un VFS en un disco de 8192 bloques son:
+
+- Superbloque: contiene información sobre el sistema de archivos, como el tamaño de los bloques, el tamaño de los inodos, dónde comienzan los bloques de inodos o datos, etc.
+- Bitmaps: estructuras que indican qué bloques o inodos están ocupados o libres.
+- Inodos: estructuras que contienen metadatos de los archivos, como permisos, tamaño, fecha de creación, etc.
+- Bloques de datos: contienen los datos de los archivos.
+
+```
+|-------------+-----------------+------------------+-------------------+-------------------|
+| Superbloque | Bitmap de datos | Bitmap de inodos | Inodos            | Bloques de datos  |
++-------------+-----------------+------------------+-------------------+-------------------+
+| 1 bloque    | 1 bloque        | 1 bloque         | 249 bloques       | 7940 bloques      |
++-------------+-----------------+------------------+-------------------+-------------------+
+```
+
+Los bloques de inodos contienen 4096/128 = 32 inodos, por lo que por cada bloque de inodos puede haber 32 bloques de datos.
+
+Si quisiésemos maximizar la cantidad de bloques de datos, deberíamos tener:
+
+(8192 - 3 ) / 33  = 248.15 => 249 bloques de inodos, y 8192 - 249 - 3 = 7940 bloques de datos.
+
+Los bitmaps de 4096 bytes son suficientes ya que pueden representar 4096*8 = 32768 bloques o inodos.
 
 </p>
 </details>
@@ -1073,9 +1128,16 @@ void spin_lock(int* lock) {
 <summary>Respuesta</summary>
 <p>
 
-La implementación no es correcta ya que tiene problemas de atomicidad: como la verificación y la asignación no se hacen en una sola operación atómica, dos hilos pueden leer simultáneamente el valor de lock y luego asignarle el valor 1, rompiendo la exlusión mutua del spinlock. Además, el bucle se encuentra en un estado busy-waiting ya que en la linea de while se verifica la condición constantemente.
+La implementación no es correcta ya que tiene problemas de atomicidad: como la verificación y la asignación no se hacen en una sola operación atómica, dos hilos pueden leer simultáneamente el valor de lock y luego asignarle el valor 1, rompiendo la exlusión mutua del spinlock.
 
-!TODO: Nuevo código
+Para solucionarlo, se puede utilizar una instrucción atómica como `__sync_lock_test_and_set` o `__sync_bool_compare_and_swap` para realizar la verificación y la asignación en una sola operación atómica.
+
+```c
+void spin_lock(int* lock) {
+    while (__sync_lock_test_and_set(lock, 1) == 1) {
+    }
+}
+```
 
 </p>
 </details>
@@ -1230,7 +1292,7 @@ Respuesta correcta: c. file
 </p>
 </details>
 
-### En una implementación típica de `malloc`, ¿qué estructura de datos se utiliza comúnmente para administrar los bloques de memoria libre?  
+### En una implementación típica de `malloc`, ¿qué estructura de datos se utiliza comúnmente para administrar los bloques de memoria libre?
 a. Árbol AVL  
 b. Tabla hash  
 c. Lista enlazada  
