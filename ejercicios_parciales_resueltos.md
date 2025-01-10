@@ -103,7 +103,7 @@ int main(void) {
 
 De modo usuario a modo Kernel:
 
-- Interrupciones: señal asincrónica enviada hacia el procesador de que algún evento externo ha sucedido y puede requerer atención del kernel.
+- Interrupciones: señal asincrónica enviada hacia el procesador de que algún evento externo ha sucedido y puede requerir atención del kernel.
 - Syscalls: instrucciones que permiten a los procesos de usuario solicitar servicios al kernel.
 - Excepciones de procesador: un evento de hardware causado por un programa de usuario. Por ejemplo, una división por cero, un acceso a memoria no permitido, etc.
 
@@ -325,9 +325,9 @@ La paginación divide la memoria en bloques de tamaño fijo llamados páginas. C
 
 Para el mecanismo de memoria paginada de tres niveles se tiene un mecanismo similar al de 2 niveles, pero con una tabla de páginas adicional.
 
-TODO: insertar esquema
+![Paginación multinivel](imagenes/memoria_paginada_3_niveles.png)
 
-Como la dirección virtual es de 32 bits, se tiene 2^32 direcciones posibles.
+Como la dirección virtual es de 32 bits, se tiene 2^32 direcciones posibles: 2^7 entradas en el primer nivel, 2^7 entradas en el segundo nivel y 2^6 entradas en el tercer nivel.
 
 </p>
 </details>
@@ -448,8 +448,6 @@ La cantidad de páginas sin asignar es entonces de 2^20 - 2325 = 1048576 - 2325 
 <summary>Respuesta</summary>
 <p>
 
-TODO: Chequear respuesta
-
 Cada sección que está asignada necesita ser mappeada a un frame de memoria física. Por lo tanto, se necesitan 2325 frames de memoria física.
 
 </p>
@@ -492,8 +490,26 @@ Pasos:
 <summary>Respuesta</summary>
 <p>
 
-TODO:
-<!-- Aquí va la respuesta -->
+Las direcciones virtuales de cada elemento del array son:
+
+| | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Dirección Virtual | 100 | 104 | 108 | 112 | 116 | 120 | 124 | 128 | 132 | 136 | 140 | 144 |
+
+Para calcular la VPN podemos dividir la dirección virtual en el tamaño de las páginas y redondearlas hacia abajo. De ahí, el offset es el resto de la división.
+
+| | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Dirección Virtual | 100 | 104 | 108 | 112 | 116 | 120 | 124 | 128 | 132 | 136 | 140 | 144 |
+| VPN | 6 | 6 | 6 | 7 | 7 | 7 | 7 | 8 | 8 | 8 | 8 | 9 |
+| Offset | 4 | 8 | 12 | 0 | 4 | 8 | 12 | 0 | 4 | 8 | 12 | 0 |
+
+El patrón de aciertos y fallos en la TLB es el siguiente:
+
+| | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 |
+|----|----|----|----|----|----|----|----|----|----|----|----|----|
+| VPN | 6 | 6 | 6 | 7 | 7 | 7 | 7 | 8 | 8 | 8 | 8 | 9 |
+| Hit/Miss | Miss | Hit | Hit | Miss | Hit | Hit | Hit | Miss | Hit | Hit | Hit | Miss |
 
 </p>
 </details>
@@ -581,8 +597,26 @@ Asuma que los procesos no terminan.
 <summary>Respuesta</summary>
 <p>
 
-TODO:
-<!-- Aquí va la respuesta -->
+```c
+int ultimo_proceso = -1;
+
+struct p* elegir() {
+    int i;
+    int total_procesos = 64;
+
+    // Comenzar a buscar desde el siguiente proceso después del último seleccionado
+    for (i = 1; i <= total_procesos; i++) {
+        int indice = (ultimo_proceso + i) % total_procesos; // Circular
+        if (procesos[indice].status == RUNNABLE) {
+            ultimo_proceso = indice; // Actualizamos el último proceso elegido
+            return &procesos[indice];
+        }
+    }
+
+    // Si no hay ningún proceso RUNNABLE, retornar NULL
+    return NULL;
+}
+```
 
 </p>
 </details>
@@ -621,8 +655,34 @@ void scheduler() {
 <summary>Respuesta</summary>
 <p>
 
-TODO:
-<!-- Aquí va la respuesta -->
+```c
+struct p {
+    int status; // RUNNING, RUNNABLE, BLOCKED
+    int veces_elegido;
+};
+
+struct p* elegir() {
+    int total_procesos = 64;
+    int min_veces_elegido = INT_MAX;
+    int indice_min_veces_elegido = -1;
+
+    for (i = 0; i < total_procesos; i++) {
+        if (procesos[i].status == RUNNABLE || procesos[i].status == RUNNING && procesos[i].veces_elegido < min_veces_elegido) {
+            min_veces_elegido = procesos[i].veces_elegido;
+            indice_min_veces_elegido = i;
+        }
+    }
+
+    if (indice_min_veces_elegido != -1) {
+        procesos[indice_min_veces_elegido].veces_elegido++;
+        return &procesos[indice_min_veces_elegido];
+    }
+
+    return NULL;
+}
+```
+
+Completely Fair Scheduler de Linux es un algoritmo de scheduling que selecciona el proceso con menor virtual runtime para correr siguiente después de un context switch. El runtime también toma en cuenta el Niceness del proceso, que es análogo a la prioridad de un proceso. Entonces, CFS, a diferencia del algoritmo implementado, toma en cuenta el tiempo real de ejecución de los procesos en lugar de estimarlo mediante la cantidad de veces que se ha seleccionado, y además toma en cuenta la prioridad de los procesos.
 
 </p>
 </details>
