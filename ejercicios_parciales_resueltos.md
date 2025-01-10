@@ -1,404 +1,13 @@
 # Ejercicios parciales resueltos
 
----
-
-## Memoria
-
-### ¿Qué es la memoria virtual? ¿Qué mecanismos conoce?: describa los tres que a ud. le parezcan más relevantes.
-
-<details>
-<summary>Respuesta</summary>
-<p>
-
-La memoria virtual es la abstracción de la memoria física que permite a los procesos tener la ilusión de disponer de toda la memoria del sistema, cuando en realidad solo tienen acceso a una parte de ella. Los mecanismos más relevantes son:
-
-- **Base y Bound**: Asigna a cada proceso una sección de memoria contigua que comienza en la base y termina en base + bound. Si se intenta acceder a una dirección fuera de este rango, se produce un error.
-
-- **Tabla de Segmentos**: Divide la memoria en segmentos con base y bound. La tabla de segmentos contiene la base, el límite y los permisos de cada segmento.
-
-- **Paginación**: Divide la memoria en bloques de tamaño fijo llamados páginas. Cada proceso accede a la memoria a través de direcciones virtuales que son traducidas a direcciones físicas mediante tablas de páginas, que contienen la dirección física de cada página. Para mejorar el rendimiento, es posible utilizar una TLB (Translation Lookaside Buffer) que almacena las traducciones más frecuentes.
-
-</p>
-</details>
-
-### Describa cómo fue variando la estructura del address space respecto la memoria física en: base y bound, tabla de registros y paginación. Explique con diagramas.
-
-<details>
-<summary>Respuesta</summary>
-<p>
-
-![Base y Bound](imagenes/base_y_bound.png)
-
-Una de las primeras técnicas para proteger la memoria es la utilización de Base y Bound. A cada proceso se le asigna una sección de memoria contigua que comienza en la base y termina en base + bound. Si se intenta acceder a una dirección fuera de este rango, se produce un error.
-
-![Tabla de Registros](imagenes/tabla_de_registros.png)
-
-El método de tabla de segmentos consiste en dividir la memoria en segmentos con base y bound. De esta forma, no es necesario disponer de memoria contigua para un proceso entereamente y se pueden aprovechar mejor los espacios libres. La tabla de segmentos contiene la base, el límite y los permisos de cada segmento.
-
-![Paginación](imagenes/paginacion.png)
-
-La paginación divide la memoria en bloques de tamaño fijo llamados páginas. Cada proceso accede a la memoria a través de direcciones virtuales que son traducidas a direcciones físicas mediante tablas de páginas, que contienen la dirección física de cada página. Para mejorar el rendimiento, es posible utilizar una TLB (Translation Lookaside Buffer) que almacena las traducciones más frecuentes, y para casos de tener una memoria virtual muy grande, se puede utilizar paginación multinivel.
-
-</p>
-</details>
-
-### Explicar el mecanismo de address translation **memoria virtual paginada** de tres niveles de indirección de 32 bits. Indique la cantidad de direcciones de memoria que provee, una virtual address: [7 bits, 7 bits, 6 bits, 12 bits] con tablas de registros de 4 bytes.
-
-<details>
-<summary>Respuesta</summary>
-<p>
-
-Para el mecanismo de memoria paginada de tres niveles se tiene un mecanismo similar al de 2 niveles, pero con una tabla de páginas adicional.
-
-!TODO: insertar esquema
-
-Como la dirección virtual es de 32 bits, se tiene 2^32 direcciones posibles.
-
-</p>
-</details>
-
-### Dado el siguiente esquema, explique cómo se realizan las traducciones recorriendo el arreglo en un modelo de memoria virtual con TLB y paginación de dos niveles. En el mismo esquema, especifique cuántos miss, hit, accesos a memoria y traducciones hay.
-
-![Esquema TLB y paginación](imagenes/1.png)
-
-Determine si son verdaderos o falsos:  
-- Hay 3 hits y 7 miss en la TLB.  
-- Hay 10 accesos a memoria.  
-- En las traducciones hay 7 hits y 3 miss en la TLB.  
-- Hay 3 traducciones completas de VA a PA.  
-- Hay 3 accesos a memoria en total.
-- Hay 10 traducciones completas de VA a PA.
-
-<details>
-<summary>Respuesta</summary>
-<p>
-
-- Hay 3 hits y 7 miss en la TLB.
-Falso, hay 7 hits y 3 miss.
-- Hay 10 accesos a memoria.
-Falso, hay 10 por los 3 miss y 7 hit y 6 más para acceder los dos niveles de páginas en los miss.
-- En las traducciones hay 7 hits y 3 miss en la TLB.
-Verdadero.
-- Hay 3 traducciones completas de VA a PA.
-Verdadero.
-- Hay 3 accesos a memoria en total.
-Falso, hay 16 como dicho anteriormente.
-- Hay 10 traducciones completas de VA a PA.
-Falso, hay 3 traducciones completas.
-
-</p>
-</details>
-
-### Suponga una dirección virtual con las siguientes características:  
-- 4 bits para el segment number  
-- 12 bits para el page number  
-- 16 bits para el offset  
-
-| Segmento | Page Table A | Page Table B |
-|----------|----------------|--------|
-| 0 Page B | 0 CAFE | 0 F000 |
-| 1 Page A | 1 DEAD | 1 D8BF |
-| X invalid | 2 BEEF | 2 3333 |
-|  | 3 BA 11 | x Invalid
-
-Traducir las siguientes direcciones virtuales a físicas:  
-```
-00000000, 20022002, 10022002, 00015555.
-```
-
-<details>
-<summary>Respuesta</summary>
-<p>
-
-Vamos a pasar a binario las direcciones virtuales y a separarlas en segment number, page number y offset.
-
-| Dirección Virtual | Binario | Segment Number | Page Number | Offset |
-|-------------------|---------|----------------|-------------|--------|
-| 00000000 | 0000 0000 0000 0000 0000 0000 | 0000 | 0000 0000 0000 | 0000 0000 0000 0000 |
-| 20022002 | 0010 0000 0000 0010 0010 0000 0010 | 0010 | 0000 0000 0000 | 0010 0010 0000 0010 |
-| 10022002 | 0001 0000 0000 0010 0010 0000 0010 | 0001 | 0000 0000 0000 | 0010 0010 0000 0010 |
-| 00015555 | 0000 0000 0000 0001 0101 0101 0101 | 0000 | 0000 0000 0000 | 0001 0101 0101 0101 |
-
-Pasado a número decimal, tenemos:
-
-| Dirección Virtual | Segment Number | Page Number | Offset |
-|-------------------|----------------|-------------|--------|
-| 00000000 | 0 | 0 | 0 |
-| 20022002 | 2 | 0 | 2002 |
-| 10022002 | 1 | 2 | 2002 |
-| 00015555 | 0 | 1 | 5555 |
-
-Entonces, mappeados:
-
-00000000 → CAFE → CAFE 0000
-
-20022002 → Invalid
-
-10022002 → BEEF → BEEF 2002
-
-00015555 → DEAD → DEAD 5555
-
-</p>
-</details>
-
-### La siguiente es una representación del espacio de direcciones virtual de un proceso. La tabla representa la totalidad de las secciones del espacio de direcciones virtual de 32 bits.
-
-| Sección | Tamaño en páginas de 4K |
-|---------|-------------------------|
-| Trampoline | 1 |
-| Stack | 512 |
-| Sin asignar | ? |
-| Heap | 1024 |
-| Data | 20 |
-| Text | 768 |
-
-#### Redacción de la tabla que abarca todo el espacio de direcciones virtual. ¿Cuánto ocupa en cantidad de páginas del espacio sin asignar (en regiones)?
-
-<details>
-<summary>Respuesta</summary>
-<p>
-
-El espacio total de direcciones virtuales en un sistema de 32 bits es de 2^32 bytes, que equivale a 2^32 / 4096 = 2^20 páginas de 4K.
-
-La cantidad de páginas asignadas es de 1 + 512 + 1024 + 20 + 768 = 2325 páginas.
-
-La cantidad de páginas sin asignar es entonces de 2^20 - 2325 = 1048576 - 2325 = 1046251 páginas.
-
-</p>
-</details> 
-
-#### Cuántas frames de memoria física son necesarias para mapear este espacio (no considere en este punto las tablas de páginas, solo las frames asignadas).
-
-<details>
-<summary>Respuesta</summary>
-<p>
-
-# Chequear respuesta
-
-Cada sección que está asignada necesita ser mappeada a un frame de memoria física. Por lo tanto, se necesitan 2325 frames de memoria física.
-
-</p>
-</details> 
-
-#### Cuántas tablas de páginas en un esquema x86 de 2 niveles de paginado son necesarias para mapear este espacio de direcciones.
-
-<details>
-<summary>Respuesta</summary>
-<p>
-
-Suponiendo direcciones virtuales con la siguiente forma: 10 bits para el índice de la tabla de nivel 1, 10 bits para el índice de la tabla de páginas de nivel 2 y 12 bits para el offset, cada tabla de páginas puede contener hasta 1024 entradas.
-
-Por lo tanto, se necesitan 2325 / 1024 = 3 tablas de páginas.
-
-</p>
-</details>
-
-### ¿Cuál es la cantidad de Kbytes que se pueden almacenar en un esquema de memoria virtual de 48 bits con 4 niveles de indirección, en la cual una dirección de memoria se describe como sigue: 9 bits page dir., 9 bits para cada page table y 12 bits para el offset? Explicar.
-
-<details>
-<summary>Respuesta</summary>
-<p>
-
-48 bits implica que existen 2^48 direcciones posibles. Asumiendo que cada dirección es de 1 byte, se pueden almacenar 2^48 bytes, lo que equivale a 2^48 / 1024 Kbytes = 2^38 Kbytes.
-
-![Estructura paginación multinivel](imagenes/paginacion_multitabla.png)
-
-</p>
-</details>
-
-### Dado un espacio de direcciones virtuales con direcciones de 8 bits y páginas de 16 bytes, asume un array de 12 elementos (cada uno de 4 bytes) comenzando en la dirección virtual 100.  
-Calcular el patrón de aciertos y fallos en la TLB cuando se accede a todos los elementos del array en un bucle. Asume que inicialmente, la TLB está vacía.  
-
-Pasos:  
-- Determina el VPN y el desplazamiento para cada elemento del array.  
-- Identifica si ocurre un acierto o un fallo en la TLB para cada acceso.  
-
-<details>
-<summary>Respuesta</summary>
-<p>
-
-!TODO:
-<!-- Aquí va la respuesta -->
-
-</p>
-</details>
-
-### Considere un sistema x86 de memoria virtual paginada de dos niveles con un espacio de direcciones de 32 bits, donde cada página tiene tamaño de 4096 bytes. Un entero ocupa 4 bytes y se tiene un array de 50000 enteros que comienza en la dirección virtual 0x01FBD000.
-El arreglo se recorre completamente, accediendo a cada elemento una vez. En este proceso, ¿a cuántas páginas distintas (no la cantidad total de accesos) necesita acceder el sistema operativo para conseguir esto? Recuerde contar las tablas de páginas intermedias, no solo las páginas que contienen los elementos del array. Desarrolle.
-
-<details>
-<summary>Respuesta</summary>
-<p>
-
-Como el arreglo tiene 50000 enteros y cada entero ocupa 4 bytes, el arreglo ocupa 200000 bytes.
-
-El arreglo comienza en la dirección virtual 0x01FBD000, que en binario es 0000 0001 1111 1011 1101 0000 0000 0000. Esto nos permite simplificar el cálculo de las páginas necesarias, ya que el offset es 0 y ocupa toda la primera página. Si no fuese así, habría que calcular dónde termina el arreglo para saber cuántas páginas se necesitan para almacenarlo.
-
-Dado lo dicho, para calcular la cantidad de páginas necesarias, dividimos el tamaño del arreglo por el tamaño de una página:
-
-200000 bytes / 4096 bytes = 48.828, entonces necesitamos 49 páginas para almacenar el arreglo.
-
-Para calcular la cantidad de páginas de tablas de páginas intermedias, dividimos la cantidad de páginas necesarias por la cantidad de páginas que puede almacenar una tabla de páginas. La dirección virtual de 32 bits con dos niveles está compuesto por 10 bits para el índice de la tabla de páginas de nivel 1, 10 bits para el índice de la tabla de páginas de nivel 2 y 12 bits para el offset. Entonces una tabla puede contener hasta 2^10 = 1024 entradas, por lo que sólo necesitamos una tabla de páginas.
-
-Ahora a esto le sumamos la tabla de directorios de tablas dado que es un sistema de dos niveles.
-
-Finalmente, necesitamos 51 páginas distintas para acceder a todos los elementos del arreglo.
-
-</p>
-</details>
-
-### Sea un disco que posee 2049 bloques de 4 KB y un sistema operativo cuyos inodos son de 256 bytes. Definir un sistema de archivos FFS. Explique las decisiones tomadas. Desarrolle.
-
-<details>
-<summary>Respuesta</summary>
-<p>
-
-Primero utilizamos un superbloque.
-
-Cada bloque puede contener 4096 / 256 = 16 inodos.
-
-Supongamos que utilizamos un bloque para el bitmap de inodos y otro para el bitmap de bloques.
-
-Quedan 2047 bloques para inodos y datos. Por cada bloque de inodo, podemos tener 16 bloques de datos, asique dividimos 2047 por 17: 2047 / 17 = 120.41. Con 121 bloques de inodos, podemos cubrir 121 * 16 = 1936 bloques de datos.
-
-De esta forma tenemos 1 superbloque, 1 bitmap de inodos, 1 bitmap de bloques, 121 bloques de inodos y 1925 bloques de datos: que suman 2049 bloques.
-
-Los bitmaps de un bloque son ambos suficientes.
-
-</p>
-</details>
+- [Kernel y Procesos](#kernel-y-procesos)
+- [Memoria](#memoria)
+- [Scheduling](#scheduling)
+- [Concurrencia](#concurrencia)
+- [Filesystem](#filesystem)
+- [Multiple Choices](#multiple-choices)
 
 ---
-
-## Scheduling
-
-### Dado el siguiente scheduler, implemente la función `elegir` para conseguir una política Round Robin (puede agregar las variables globales que crea necesarias):
-
-```c
-void switch(struct p* proceso); // Asuma ya implementada
-
-struct p {
-    int status; // RUNNING, RUNNABLE, BLOCKED
-};
-
-struct p p[64]; // Tabla de procesos, máximo de 64
-
-struct p* elegir() {
-    // TODO: implementar aquí
-}
-
-void scheduler() {
-    for (;;) {
-        struct p* candidato = elegir();
-        if (candidato == NULL) {
-            idle();
-        } else {
-            candidato->status = RUNNING;
-            switch(candidato);
-        }
-    }
-}
-```	
-Asuma que switch ya existe y recibe un struct p* con estado RUNNING y hace un cambio de contexto a ese proceso. Cuando el proceso se suspende, devuelve el control al scheduler (en este momento el proceso tendrá estado RUNNABLE o BLOCKED).
-Asuma que los procesos no terminan.
-
-<details>
-<summary>Respuesta</summary>
-<p>
-
-!TODO:
-<!-- Aquí va la respuesta -->
-
-</p>
-</details>
-
-### Dado el siguiente scheduler, implemente la función `elegir` para conseguir una política que seleccione el proceso que menos veces se haya seleccionado hasta el momento (puede modificar `struct p` agregando los campos que crea necesarios):
-
-```c
-void switch(struct p* proceso); // Asuma ya implementada
-
-struct p {
-    int status; // RUNNING, RUNNABLE, BLOCKED
-};
-
-struct p p[64]; // Tabla de procesos, máximo de 64
-
-struct p* elegir() {
-    // TODO: implementar aquí
-}
-
-void scheduler() {
-    for (;;) {
-        struct p* candidato = elegir();
-        if (candidato == NULL) {
-            idle();
-        } else {
-            candidato->status = RUNNING;
-            switch(candidato);
-        }
-    }
-}
-```
-
-¿Qué diferencias encuentra entre el scheduler del punto anterior y el Completely Fair Scheduler de Linux?
-
-<details>
-<summary>Respuesta</summary>
-<p>
-
-!TODO:
-<!-- Aquí va la respuesta -->
-
-</p>
-</details>
-
-### ¿Qué es un context switch? En un context switch, cuáles de las siguientes cosas no deben/deben ser guardadas y por qué?:  a. registros de propósito general, b. translation lookaside buffer, c. program counter, d. Page Directory Entry, e. PCB entry, e. ninguna.
-
-<details>
-<summary>Respuesta</summary>
-<p>
-
-Un context switch es el proceso de guardar todo lo necesario de un proceso que se está ejecutando para poder ejecutar otro proceso, y luego restaurar el estado del proceso original. Lo que se guarda lo llamamos contexto, de ahí el nombre.
-
-a. Los registros de propósito general deben ser guardados, ya que pueden ser modificados por el nuevo proceso que se va a ejecutar.
-b. La TLB no debe ser guardada, es parte de la MMU.
-c. El program counter debe ser guardado, ya que indica la próxima instrucción a ejecutar.
-d. La Page Directory Entry debe ser guardada ya que cada proceso tiene su propio espacio de direcciones.
-e. La PCB entry debe ser guardada, es todo lo necesario para poder restaurar el proceso.
-
-</p>
-</details>
-
-### Explique con un ejemplo MLFQ y por qué es mejor que otras políticas de scheduling.
-
-<details>
-<summary>Respuesta</summary>
-<p>
-
-MLFQ (Multi-Level Feedback Queue) es una política de scheduling que divide los procesos en diferentes colas con diferentes prioridades. Los procesos se mueven entre las colas basándose en su tiempo de ejecución: los procesos nuevos y los procesos I/O-bound se colocan en la cola de mayor prioridad, y cada vez que un proceso consume su quantum de tiempo sin completarse, se mueve a una cola de prioridad inferior. Esto permite mayor responsividad ante políticas como Round-Robin y evita que un proceso ocupe la CPU indefinidamente o que un proceso espere indefinidamente por la CPU, que podría pasar en políticas como FIFO.
-
-Un ejemplo de MLFQ sería el siguiente:
-
-- Cola 0: Quantum de 8ms, procesos nuevos y procesos I/O-bound.
-- Cola 1: Quantum de 16ms, procesos que no se completaron en la cola 0.
-- Cola 2: Quantum de 32ms, procesos que no se completaron en la cola 1.
-- Cola 3: Quantum de 64ms, procesos que no se completaron en la cola 2.
-
-</p>
-</details>
-
-###  Describa la política Completely Fair Scheduler de linux y relaciónelo con MLFQ. ¿Cuál es la idea detras de ambos? Explíquela detalladamente.
-
-<details>
-<summary>Respuesta</summary>
-<p>
-
-El Completely Fair Scheduler de Linux elige el proceso con menor virtual runtime para correr siguiente después de un context switch. El runtime también toma en cuenta el Niceness del proceso, que es análogo a la prioridad de un proceso. Puede tomar valores de -20 a 19, y el runtime es recalculado dividiendo el runtime actual por el niceness. Internamente el CFS utiliza un árbol rojo-negro para mantener los procesos ordenados por virtual runtime de forma eficiente.
-
-Por otro lado, tiene los siguientes atributos: min_granularity que indica el tiempo mínimo que un proceso puede correr a la vez, y sched_latency, que es el tiempo que el scheduler desea repartir en cada iteración.
-
-</p>
-</details>
 
 ## Kernel y Procesos
 
@@ -668,6 +277,406 @@ Para encadenar dos comandos por salidas y entradas estándar, se puede utilizar 
 
 ---
 
+## Memoria
+
+### ¿Qué es la memoria virtual? ¿Qué mecanismos conoce?: describa los tres que a ud. le parezcan más relevantes.
+
+<details>
+<summary>Respuesta</summary>
+<p>
+
+La memoria virtual es la abstracción de la memoria física que permite a los procesos tener la ilusión de disponer de toda la memoria del sistema, cuando en realidad solo tienen acceso a una parte de ella. Los mecanismos más relevantes son:
+
+- **Base y Bound**: Asigna a cada proceso una sección de memoria contigua que comienza en la base y termina en base + bound. Si se intenta acceder a una dirección fuera de este rango, se produce un error.
+
+- **Tabla de Segmentos**: Divide la memoria en segmentos con base y bound. La tabla de segmentos contiene la base, el límite y los permisos de cada segmento.
+
+- **Paginación**: Divide la memoria en bloques de tamaño fijo llamados páginas. Cada proceso accede a la memoria a través de direcciones virtuales que son traducidas a direcciones físicas mediante tablas de páginas, que contienen la dirección física de cada página. Para mejorar el rendimiento, es posible utilizar una TLB (Translation Lookaside Buffer) que almacena las traducciones más frecuentes.
+
+</p>
+</details>
+
+### Describa cómo fue variando la estructura del address space respecto la memoria física en: base y bound, tabla de registros y paginación. Explique con diagramas.
+
+<details>
+<summary>Respuesta</summary>
+<p>
+
+![Base y Bound](imagenes/base_y_bound.png)
+
+Una de las primeras técnicas para proteger la memoria es la utilización de Base y Bound. A cada proceso se le asigna una sección de memoria contigua que comienza en la base y termina en base + bound. Si se intenta acceder a una dirección fuera de este rango, se produce un error.
+
+![Tabla de Registros](imagenes/tabla_de_registros.png)
+
+El método de tabla de segmentos consiste en dividir la memoria en segmentos con base y bound. De esta forma, no es necesario disponer de memoria contigua para un proceso entereamente y se pueden aprovechar mejor los espacios libres. La tabla de segmentos contiene la base, el límite y los permisos de cada segmento.
+
+![Paginación](imagenes/paginacion.png)
+
+La paginación divide la memoria en bloques de tamaño fijo llamados páginas. Cada proceso accede a la memoria a través de direcciones virtuales que son traducidas a direcciones físicas mediante tablas de páginas, que contienen la dirección física de cada página. Para mejorar el rendimiento, es posible utilizar una TLB (Translation Lookaside Buffer) que almacena las traducciones más frecuentes, y para casos de tener una memoria virtual muy grande, se puede utilizar paginación multinivel.
+
+</p>
+</details>
+
+### Explicar el mecanismo de address translation **memoria virtual paginada** de tres niveles de indirección de 32 bits. Indique la cantidad de direcciones de memoria que provee, una virtual address: [7 bits, 7 bits, 6 bits, 12 bits] con tablas de registros de 4 bytes.
+
+<details>
+<summary>Respuesta</summary>
+<p>
+
+Para el mecanismo de memoria paginada de tres niveles se tiene un mecanismo similar al de 2 niveles, pero con una tabla de páginas adicional.
+
+TODO: insertar esquema
+
+Como la dirección virtual es de 32 bits, se tiene 2^32 direcciones posibles.
+
+</p>
+</details>
+
+### Dado el siguiente esquema, explique cómo se realizan las traducciones recorriendo el arreglo en un modelo de memoria virtual con TLB y paginación de dos niveles. En el mismo esquema, especifique cuántos miss, hit, accesos a memoria y traducciones hay.
+
+![Esquema TLB y paginación](imagenes/1.png)
+
+Determine si son verdaderos o falsos:  
+- Hay 3 hits y 7 miss en la TLB.  
+- Hay 10 accesos a memoria.  
+- En las traducciones hay 7 hits y 3 miss en la TLB.  
+- Hay 3 traducciones completas de VA a PA.  
+- Hay 3 accesos a memoria en total.
+- Hay 10 traducciones completas de VA a PA.
+
+<details>
+<summary>Respuesta</summary>
+<p>
+
+- Hay 3 hits y 7 miss en la TLB.
+Falso, hay 7 hits y 3 miss.
+- Hay 10 accesos a memoria.
+Falso, hay 10 por los 3 miss y 7 hit y 6 más para acceder los dos niveles de páginas en los miss.
+- En las traducciones hay 7 hits y 3 miss en la TLB.
+Verdadero.
+- Hay 3 traducciones completas de VA a PA.
+Verdadero.
+- Hay 3 accesos a memoria en total.
+Falso, hay 16 como dicho anteriormente.
+- Hay 10 traducciones completas de VA a PA.
+Falso, hay 3 traducciones completas.
+
+</p>
+</details>
+
+### Suponga una dirección virtual con las siguientes características:  
+- 4 bits para el segment number  
+- 12 bits para el page number  
+- 16 bits para el offset  
+
+| Segmento | Page Table A | Page Table B |
+|----------|----------------|--------|
+| 0 Page B | 0 CAFE | 0 F000 |
+| 1 Page A | 1 DEAD | 1 D8BF |
+| X invalid | 2 BEEF | 2 3333 |
+|  | 3 BA 11 | x Invalid
+
+Traducir las siguientes direcciones virtuales a físicas:  
+```
+00000000, 20022002, 10022002, 00015555.
+```
+
+<details>
+<summary>Respuesta</summary>
+<p>
+
+Vamos a pasar a binario las direcciones virtuales y a separarlas en segment number, page number y offset.
+
+| Dirección Virtual | Binario | Segment Number | Page Number | Offset |
+|-------------------|---------|----------------|-------------|--------|
+| 00000000 | 0000 0000 0000 0000 0000 0000 | 0000 | 0000 0000 0000 | 0000 0000 0000 0000 |
+| 20022002 | 0010 0000 0000 0010 0010 0000 0010 | 0010 | 0000 0000 0000 | 0010 0010 0000 0010 |
+| 10022002 | 0001 0000 0000 0010 0010 0000 0010 | 0001 | 0000 0000 0000 | 0010 0010 0000 0010 |
+| 00015555 | 0000 0000 0000 0001 0101 0101 0101 | 0000 | 0000 0000 0000 | 0001 0101 0101 0101 |
+
+Pasado a número decimal, tenemos:
+
+| Dirección Virtual | Segment Number | Page Number | Offset |
+|-------------------|----------------|-------------|--------|
+| 00000000 | 0 | 0 | 0 |
+| 20022002 | 2 | 0 | 2002 |
+| 10022002 | 1 | 2 | 2002 |
+| 00015555 | 0 | 1 | 5555 |
+
+Entonces, mappeados:
+
+00000000 → CAFE → CAFE 0000
+
+20022002 → Invalid
+
+10022002 → BEEF → BEEF 2002
+
+00015555 → DEAD → DEAD 5555
+
+</p>
+</details>
+
+### La siguiente es una representación del espacio de direcciones virtual de un proceso. La tabla representa la totalidad de las secciones del espacio de direcciones virtual de 32 bits.
+
+| Sección | Tamaño en páginas de 4K |
+|---------|-------------------------|
+| Trampoline | 1 |
+| Stack | 512 |
+| Sin asignar | ? |
+| Heap | 1024 |
+| Data | 20 |
+| Text | 768 |
+
+#### Redacción de la tabla que abarca todo el espacio de direcciones virtual. ¿Cuánto ocupa en cantidad de páginas del espacio sin asignar (en regiones)?
+
+<details>
+<summary>Respuesta</summary>
+<p>
+
+El espacio total de direcciones virtuales en un sistema de 32 bits es de 2^32 bytes, que equivale a 2^32 / 4096 = 2^20 páginas de 4K.
+
+La cantidad de páginas asignadas es de 1 + 512 + 1024 + 20 + 768 = 2325 páginas.
+
+La cantidad de páginas sin asignar es entonces de 2^20 - 2325 = 1048576 - 2325 = 1046251 páginas.
+
+</p>
+</details> 
+
+#### Cuántas frames de memoria física son necesarias para mapear este espacio (no considere en este punto las tablas de páginas, solo las frames asignadas).
+
+<details>
+<summary>Respuesta</summary>
+<p>
+
+TODO: Chequear respuesta
+
+Cada sección que está asignada necesita ser mappeada a un frame de memoria física. Por lo tanto, se necesitan 2325 frames de memoria física.
+
+</p>
+</details> 
+
+#### Cuántas tablas de páginas en un esquema x86 de 2 niveles de paginado son necesarias para mapear este espacio de direcciones.
+
+<details>
+<summary>Respuesta</summary>
+<p>
+
+Suponiendo direcciones virtuales con la siguiente forma: 10 bits para el índice de la tabla de nivel 1, 10 bits para el índice de la tabla de páginas de nivel 2 y 12 bits para el offset, cada tabla de páginas puede contener hasta 1024 entradas.
+
+Por lo tanto, se necesitan 2325 / 1024 = 3 tablas de páginas.
+
+</p>
+</details>
+
+### ¿Cuál es la cantidad de Kbytes que se pueden almacenar en un esquema de memoria virtual de 48 bits con 4 niveles de indirección, en la cual una dirección de memoria se describe como sigue: 9 bits page dir., 9 bits para cada page table y 12 bits para el offset? Explicar.
+
+<details>
+<summary>Respuesta</summary>
+<p>
+
+48 bits implica que existen 2^48 direcciones posibles. Asumiendo que cada dirección es de 1 byte, se pueden almacenar 2^48 bytes, lo que equivale a 2^48 / 1024 Kbytes = 2^38 Kbytes.
+
+![Estructura paginación multinivel](imagenes/paginacion_multitabla.png)
+
+</p>
+</details>
+
+### Dado un espacio de direcciones virtuales con direcciones de 8 bits y páginas de 16 bytes, asume un array de 12 elementos (cada uno de 4 bytes) comenzando en la dirección virtual 100.  
+Calcular el patrón de aciertos y fallos en la TLB cuando se accede a todos los elementos del array en un bucle. Asume que inicialmente, la TLB está vacía.  
+
+Pasos:  
+- Determina el VPN y el desplazamiento para cada elemento del array.  
+- Identifica si ocurre un acierto o un fallo en la TLB para cada acceso.  
+
+<details>
+<summary>Respuesta</summary>
+<p>
+
+TODO:
+<!-- Aquí va la respuesta -->
+
+</p>
+</details>
+
+### Considere un sistema x86 de memoria virtual paginada de dos niveles con un espacio de direcciones de 32 bits, donde cada página tiene tamaño de 4096 bytes. Un entero ocupa 4 bytes y se tiene un array de 50000 enteros que comienza en la dirección virtual 0x01FBD000.
+El arreglo se recorre completamente, accediendo a cada elemento una vez. En este proceso, ¿a cuántas páginas distintas (no la cantidad total de accesos) necesita acceder el sistema operativo para conseguir esto? Recuerde contar las tablas de páginas intermedias, no solo las páginas que contienen los elementos del array. Desarrolle.
+
+<details>
+<summary>Respuesta</summary>
+<p>
+
+Como el arreglo tiene 50000 enteros y cada entero ocupa 4 bytes, el arreglo ocupa 200000 bytes.
+
+El arreglo comienza en la dirección virtual 0x01FBD000, que en binario es 0000 0001 1111 1011 1101 0000 0000 0000. Esto nos permite simplificar el cálculo de las páginas necesarias, ya que el offset es 0 y ocupa toda la primera página. Si no fuese así, habría que calcular dónde termina el arreglo para saber cuántas páginas se necesitan para almacenarlo.
+
+Dado lo dicho, para calcular la cantidad de páginas necesarias, dividimos el tamaño del arreglo por el tamaño de una página:
+
+200000 bytes / 4096 bytes = 48.828, entonces necesitamos 49 páginas para almacenar el arreglo.
+
+Para calcular la cantidad de páginas de tablas de páginas intermedias, dividimos la cantidad de páginas necesarias por la cantidad de páginas que puede almacenar una tabla de páginas. La dirección virtual de 32 bits con dos niveles está compuesto por 10 bits para el índice de la tabla de páginas de nivel 1, 10 bits para el índice de la tabla de páginas de nivel 2 y 12 bits para el offset. Entonces una tabla puede contener hasta 2^10 = 1024 entradas, por lo que sólo necesitamos una tabla de páginas.
+
+Ahora a esto le sumamos la tabla de directorios de tablas dado que es un sistema de dos niveles.
+
+Finalmente, necesitamos 51 páginas distintas para acceder a todos los elementos del arreglo.
+
+</p>
+</details>
+
+### Sea un disco que posee 2049 bloques de 4 KB y un sistema operativo cuyos inodos son de 256 bytes. Definir un sistema de archivos FFS. Explique las decisiones tomadas. Desarrolle.
+
+<details>
+<summary>Respuesta</summary>
+<p>
+
+Primero utilizamos un superbloque.
+
+Cada bloque puede contener 4096 / 256 = 16 inodos.
+
+Supongamos que utilizamos un bloque para el bitmap de inodos y otro para el bitmap de bloques.
+
+Quedan 2047 bloques para inodos y datos. Por cada bloque de inodo, podemos tener 16 bloques de datos, asique dividimos 2047 por 17: 2047 / 17 = 120.41. Con 121 bloques de inodos, podemos cubrir 121 * 16 = 1936 bloques de datos.
+
+De esta forma tenemos 1 superbloque, 1 bitmap de inodos, 1 bitmap de bloques, 121 bloques de inodos y 1925 bloques de datos: que suman 2049 bloques.
+
+Los bitmaps de un bloque son ambos suficientes.
+
+</p>
+</details>
+
+---
+
+## Scheduling
+
+### Dado el siguiente scheduler, implemente la función `elegir` para conseguir una política Round Robin (puede agregar las variables globales que crea necesarias):
+
+```c
+void switch(struct p* proceso); // Asuma ya implementada
+
+struct p {
+    int status; // RUNNING, RUNNABLE, BLOCKED
+};
+
+struct p p[64]; // Tabla de procesos, máximo de 64
+
+struct p* elegir() {
+    // TODO: implementar aquí
+}
+
+void scheduler() {
+    for (;;) {
+        struct p* candidato = elegir();
+        if (candidato == NULL) {
+            idle();
+        } else {
+            candidato->status = RUNNING;
+            switch(candidato);
+        }
+    }
+}
+```	
+Asuma que switch ya existe y recibe un struct p* con estado RUNNING y hace un cambio de contexto a ese proceso. Cuando el proceso se suspende, devuelve el control al scheduler (en este momento el proceso tendrá estado RUNNABLE o BLOCKED).
+Asuma que los procesos no terminan.
+
+<details>
+<summary>Respuesta</summary>
+<p>
+
+TODO:
+<!-- Aquí va la respuesta -->
+
+</p>
+</details>
+
+### Dado el siguiente scheduler, implemente la función `elegir` para conseguir una política que seleccione el proceso que menos veces se haya seleccionado hasta el momento (puede modificar `struct p` agregando los campos que crea necesarios):
+
+```c
+void switch(struct p* proceso); // Asuma ya implementada
+
+struct p {
+    int status; // RUNNING, RUNNABLE, BLOCKED
+};
+
+struct p p[64]; // Tabla de procesos, máximo de 64
+
+struct p* elegir() {
+    // TODO: implementar aquí
+}
+
+void scheduler() {
+    for (;;) {
+        struct p* candidato = elegir();
+        if (candidato == NULL) {
+            idle();
+        } else {
+            candidato->status = RUNNING;
+            switch(candidato);
+        }
+    }
+}
+```
+
+¿Qué diferencias encuentra entre el scheduler del punto anterior y el Completely Fair Scheduler de Linux?
+
+<details>
+<summary>Respuesta</summary>
+<p>
+
+TODO:
+<!-- Aquí va la respuesta -->
+
+</p>
+</details>
+
+### ¿Qué es un context switch? En un context switch, cuáles de las siguientes cosas no deben/deben ser guardadas y por qué?:  a. registros de propósito general, b. translation lookaside buffer, c. program counter, d. Page Directory Entry, e. PCB entry, e. ninguna.
+
+<details>
+<summary>Respuesta</summary>
+<p>
+
+Un context switch es el proceso de guardar todo lo necesario de un proceso que se está ejecutando para poder ejecutar otro proceso, y luego restaurar el estado del proceso original. Lo que se guarda lo llamamos contexto, de ahí el nombre.
+
+a. Los registros de propósito general deben ser guardados, ya que pueden ser modificados por el nuevo proceso que se va a ejecutar.
+b. La TLB no debe ser guardada, es parte de la MMU.
+c. El program counter debe ser guardado, ya que indica la próxima instrucción a ejecutar.
+d. La Page Directory Entry debe ser guardada ya que cada proceso tiene su propio espacio de direcciones.
+e. La PCB entry debe ser guardada, es todo lo necesario para poder restaurar el proceso.
+
+</p>
+</details>
+
+### Explique con un ejemplo MLFQ y por qué es mejor que otras políticas de scheduling.
+
+<details>
+<summary>Respuesta</summary>
+<p>
+
+MLFQ (Multi-Level Feedback Queue) es una política de scheduling que divide los procesos en diferentes colas con diferentes prioridades. Los procesos se mueven entre las colas basándose en su tiempo de ejecución: los procesos nuevos y los procesos I/O-bound se colocan en la cola de mayor prioridad, y cada vez que un proceso consume su quantum de tiempo sin completarse, se mueve a una cola de prioridad inferior. Esto permite mayor responsividad ante políticas como Round-Robin y evita que un proceso ocupe la CPU indefinidamente o que un proceso espere indefinidamente por la CPU, que podría pasar en políticas como FIFO.
+
+Un ejemplo de MLFQ sería el siguiente:
+
+- Cola 0: Quantum de 8ms, procesos nuevos y procesos I/O-bound.
+- Cola 1: Quantum de 16ms, procesos que no se completaron en la cola 0.
+- Cola 2: Quantum de 32ms, procesos que no se completaron en la cola 1.
+- Cola 3: Quantum de 64ms, procesos que no se completaron en la cola 2.
+
+</p>
+</details>
+
+###  Describa la política Completely Fair Scheduler de linux y relaciónelo con MLFQ. ¿Cuál es la idea detras de ambos? Explíquela detalladamente.
+
+<details>
+<summary>Respuesta</summary>
+<p>
+
+El Completely Fair Scheduler de Linux elige el proceso con menor virtual runtime para correr siguiente después de un context switch. El runtime también toma en cuenta el Niceness del proceso, que es análogo a la prioridad de un proceso. Puede tomar valores de -20 a 19, y el runtime es recalculado dividiendo el runtime actual por el niceness. Internamente el CFS utiliza un árbol rojo-negro para mantener los procesos ordenados por virtual runtime de forma eficiente.
+
+Por otro lado, tiene los siguientes atributos: min_granularity que indica el tiempo mínimo que un proceso puede correr a la vez, y sched_latency, que es el tiempo que el scheduler desea repartir en cada iteración.
+
+</p>
+</details>
+
+---
+
 ## Concurrencia
 
 ### Describa qué es un thread y use su API para crear un programa que use 5 threads para incrementar una variable compartida por todos en 7 unidades/thread hasta llegar a 1000.
@@ -675,6 +684,8 @@ Para encadenar dos comandos por salidas y entradas estándar, se puede utilizar 
 <details>
 <summary>Respuesta</summary>
 <p>
+
+Un thread es una unidad de ejecución independiente que permite la ejecución concurrente de tareas dentro de un proceso. Los threads comparten el espacio de memoria y los recursos del proceso principal, lo que permite trabajar con datos compartidos entre ellos de manera eficiente. Esto se usa para optimizar tareas concurrentes o paralelas.
 
 ```c
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -757,6 +768,99 @@ Entre threads de un mismo programa se comparten:
 En el gráfico se puede ver que en diversos hilos de un proceso comparten el código, los datos estáticos y el heap, mientras que cada proceso tiene su propio código, datos estáticos y heap. Igualmente cada thread tiene su propio stack, registros y program counter, ya que cada thread puede estar en un estado distinto de ejecución. Los threads también comparten los file descriptors y las señales.
 
 En Linux no existe una distinción clara entre procesos e hilos, llamándose ambos tareas, lo que es posible apreciar en las implementaciones de fork y pthread_create; que son wrappers de la syscall clone pero con distintos argumentos.
+
+</p>
+</details>
+
+
+### ¿Cuáles son las diferencias entre un spin lock y un sleep lock? ¿Cuándo usaría cada uno?
+
+<details>
+<summary>Respuesta</summary>
+<p>
+
+- **Spin lock**: Un spin lock es un mecanismo de bloqueo que consiste en un bucle que espera activamente hasta que el recurso esté disponible. Es útil cuando se espera que el recurso esté disponible rápidamente y no se quiere cambiar de contexto.
+- **Sleep lock**: Un sleep lock es un mecanismo de bloqueo que pone al proceso en espera hasta que el recurso esté disponible. Es útil cuando se espera que el recurso esté disponible en un tiempo largo y no se quiere consumir CPU innecesariamente.
+
+</p>
+</details>
+
+### ¿Es correcta la siguiente implementación de este spinlock? Explique qué problema tiene y cómo solucionarlo:
+
+```c
+void spin_lock(int* lock) {
+    while (*lock != 0) {
+    }
+    *lock = 1;
+}
+```
+
+<details>
+<summary>Respuesta</summary>
+<p>
+
+La implementación no es correcta ya que tiene problemas de atomicidad: como la verificación y la asignación no se hacen en una sola operación atómica, dos hilos pueden leer simultáneamente el valor de lock y luego asignarle el valor 1, rompiendo la exlusión mutua del spinlock.
+
+Para solucionarlo, se puede utilizar una instrucción atómica como `__sync_lock_test_and_set` o `__sync_bool_compare_and_swap` para realizar la verificación y la asignación en una sola operación atómica.
+
+```c
+void spin_lock(int* lock) {
+    while (__sync_lock_test_and_set(lock, 1) == 1) {
+    }
+}
+```
+
+</p>
+</details>
+
+### ¿Qué es un deadlock? Describa por lo menos tres casos diferentes en el que puede suceder.
+
+<details>
+<summary>Respuesta</summary>
+<p>
+
+El deadlock hace referencia a la situación en donde dos o más procesos se encuentran bloqueados indefinidamente esperando por un recurso del otro, dado que para liberar dichos recursos, necesitan de los recursos que el otro proceso tiene.
+
+Ejemplo 1:
+    - Proceso 1 tiene recurso A y necesita recurso B.
+    - Proceso 2 tiene recurso B y necesita recurso A.
+
+Ejemplo 2:
+    - Proceso 1 tiene recurso A y necesita recurso B.
+    - Proceso 2 tiene recurso B y necesita recurso C.
+    - Proceso 3 tiene recurso C y necesita recurso A.
+</p>
+</details>
+
+### ¿Es correcta la siguiente implementación de este programa que actualiza el saldo de una cuenta? Explique qué problema tiene y cómo solucionarlo:
+
+```c
+void add(int incremento) {
+    int v;
+    v = cuenta_leer_saldo();
+    v += incremento;
+    cuenta_escribir_saldo(v);
+}
+```
+
+<details>
+<summary>Respuesta</summary>
+<p>
+
+La implementación no es correcta ya que tiene problemas de concurrencia: si dos hilos leen el saldo al mismo tiempo, incrementan el saldo y lo escriben, se puede perder una actualización. Para solucionarlo, se puede utilizar un mecanismo de bloqueo, como un mutex, para asegurar la exclusión mutua.
+
+```c
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+
+void add(int incremento) {
+    pthread_mutex_lock(&mutex);
+    int v;
+    v = cuenta_leer_saldo();
+    v += incremento;
+    cuenta_escribir_saldo(v);
+    pthread_mutex_unlock(&mutex);
+}
+```
 
 </p>
 </details>
@@ -1094,102 +1198,6 @@ Si quisiésemos maximizar la cantidad de bloques de datos, deberíamos tener:
 (8192 - 3 ) / 33  = 248.15 => 249 bloques de inodos, y 8192 - 249 - 3 = 7940 bloques de datos.
 
 Los bitmaps de 4096 bytes son suficientes ya que pueden representar 4096*8 = 32768 bloques o inodos.
-
-</p>
-</details>
-
----
-
-## Locks
-
-### ¿Cuáles son las diferencias entre un spin lock y un sleep lock? ¿Cuándo usaría cada uno?
-
-<details>
-<summary>Respuesta</summary>
-<p>
-
-- **Spin lock**: Un spin lock es un mecanismo de bloqueo que consiste en un bucle que espera activamente hasta que el recurso esté disponible. Es útil cuando se espera que el recurso esté disponible rápidamente y no se quiere cambiar de contexto.
-- **Sleep lock**: Un sleep lock es un mecanismo de bloqueo que pone al proceso en espera hasta que el recurso esté disponible. Es útil cuando se espera que el recurso esté disponible en un tiempo largo y no se quiere consumir CPU innecesariamente.
-
-</p>
-</details>
-
-### ¿Es correcta la siguiente implementación de este spinlock? Explique qué problema tiene y cómo solucionarlo:
-
-```c
-void spin_lock(int* lock) {
-    while (*lock != 0) {
-    }
-    *lock = 1;
-}
-```
-
-<details>
-<summary>Respuesta</summary>
-<p>
-
-La implementación no es correcta ya que tiene problemas de atomicidad: como la verificación y la asignación no se hacen en una sola operación atómica, dos hilos pueden leer simultáneamente el valor de lock y luego asignarle el valor 1, rompiendo la exlusión mutua del spinlock.
-
-Para solucionarlo, se puede utilizar una instrucción atómica como `__sync_lock_test_and_set` o `__sync_bool_compare_and_swap` para realizar la verificación y la asignación en una sola operación atómica.
-
-```c
-void spin_lock(int* lock) {
-    while (__sync_lock_test_and_set(lock, 1) == 1) {
-    }
-}
-```
-
-</p>
-</details>
-
-### ¿Qué es un deadlock? Describa por lo menos tres casos diferentes en el que puede suceder.
-
-<details>
-<summary>Respuesta</summary>
-<p>
-
-El deadlock hace referencia a la situación en donde dos o más procesos se encuentran bloqueados indefinidamente esperando por un recurso del otro, dado que para liberar dichos recursos, necesitan de los recursos que el otro proceso tiene.
-
-Ejemplo 1:
-    - Proceso 1 tiene recurso A y necesita recurso B.
-    - Proceso 2 tiene recurso B y necesita recurso A.
-
-Ejemplo 2:
-    - Proceso 1 tiene recurso A y necesita recurso B.
-    - Proceso 2 tiene recurso B y necesita recurso C.
-    - Proceso 3 tiene recurso C y necesita recurso A.
-</p>
-</details>
-
-### ¿Es correcta la siguiente implementación de este programa que actualiza el saldo de una cuenta? Explique qué problema tiene y cómo solucionarlo:
-
-```c
-void add(int incremento) {
-    int v;
-    v = cuenta_leer_saldo();
-    v += incremento;
-    cuenta_escribir_saldo(v);
-}
-```
-
-<details>
-<summary>Respuesta</summary>
-<p>
-
-La implementación no es correcta ya que tiene problemas de concurrencia: si dos hilos leen el saldo al mismo tiempo, incrementan el saldo y lo escriben, se puede perder una actualización. Para solucionarlo, se puede utilizar un mecanismo de bloqueo, como un mutex, para asegurar la exclusión mutua.
-
-```c
-pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-
-void add(int incremento) {
-    pthread_mutex_lock(&mutex);
-    int v;
-    v = cuenta_leer_saldo();
-    v += incremento;
-    cuenta_escribir_saldo(v);
-    pthread_mutex_unlock(&mutex);
-}
-```
 
 </p>
 </details>

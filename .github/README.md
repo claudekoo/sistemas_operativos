@@ -1,0 +1,1 @@
+../ejercicios_parciales_resueltos.md
