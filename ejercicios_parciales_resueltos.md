@@ -302,15 +302,15 @@ La memoria virtual es la abstracción de la memoria física que permite a los pr
 <summary>Respuesta</summary>
 <p>
 
-![Base y Bound](imagenes/base_y_bound.png)
+![Base y Bound](../imagenes/base_y_bound.png)
 
 Una de las primeras técnicas para proteger la memoria es la utilización de Base y Bound. A cada proceso se le asigna una sección de memoria contigua que comienza en la base y termina en base + bound. Si se intenta acceder a una dirección fuera de este rango, se produce un error.
 
-![Tabla de Registros](imagenes/tabla_de_registros.png)
+![Tabla de Registros](../imagenes/tabla_de_registros.png)
 
 El método de tabla de segmentos consiste en dividir la memoria en segmentos con base y bound. De esta forma, no es necesario disponer de memoria contigua para un proceso entereamente y se pueden aprovechar mejor los espacios libres. La tabla de segmentos contiene la base, el límite y los permisos de cada segmento.
 
-![Paginación](imagenes/paginacion.png)
+![Paginación](../imagenes/paginacion.png)
 
 La paginación divide la memoria en bloques de tamaño fijo llamados páginas. Cada proceso accede a la memoria a través de direcciones virtuales que son traducidas a direcciones físicas mediante tablas de páginas, que contienen la dirección física de cada página. Para mejorar el rendimiento, es posible utilizar una TLB (Translation Lookaside Buffer) que almacena las traducciones más frecuentes, y para casos de tener una memoria virtual muy grande, se puede utilizar paginación multinivel.
 
@@ -325,7 +325,7 @@ La paginación divide la memoria en bloques de tamaño fijo llamados páginas. C
 
 Para el mecanismo de memoria paginada de tres niveles se tiene un mecanismo similar al de 2 niveles, pero con una tabla de páginas adicional.
 
-![Paginación multinivel](imagenes/memoria_paginada_3_niveles.png)
+![Paginación multinivel](../imagenes/memoria_paginada_3_niveles.png)
 
 Como la dirección virtual es de 32 bits, se tiene 2^32 direcciones posibles: 2^7 entradas en el primer nivel, 2^7 entradas en el segundo nivel y 2^6 entradas en el tercer nivel.
 
@@ -334,7 +334,7 @@ Como la dirección virtual es de 32 bits, se tiene 2^32 direcciones posibles: 2^
 
 ### Dado el siguiente esquema, explique cómo se realizan las traducciones recorriendo el arreglo en un modelo de memoria virtual con TLB y paginación de dos niveles. En el mismo esquema, especifique cuántos miss, hit, accesos a memoria y traducciones hay.
 
-![Esquema TLB y paginación](imagenes/1.png)
+![Esquema TLB y paginación](../imagenes/1.png)
 
 Determine si son verdaderos o falsos:  
 - Hay 3 hits y 7 miss en la TLB.  
@@ -474,7 +474,7 @@ Por lo tanto, se necesitan 2325 / 1024 = 3 tablas de páginas.
 
 48 bits implica que existen 2^48 direcciones posibles. Asumiendo que cada dirección es de 1 byte, se pueden almacenar 2^48 bytes, lo que equivale a 2^48 / 1024 Kbytes = 2^38 Kbytes.
 
-![Estructura paginación multinivel](imagenes/paginacion_multitabla.png)
+![Estructura paginación multinivel](../imagenes/paginacion_multitabla.png)
 
 </p>
 </details>
@@ -823,7 +823,7 @@ Entre threads de un mismo programa se comparten:
 <summary>Respuesta</summary>
 <p>
 
-![Proceso vs Thread](imagenes/proceso_vs_thread.png)
+![Proceso vs Thread](../imagenes/proceso_vs_thread.png)
 
 En el gráfico se puede ver que en diversos hilos de un proceso comparten el código, los datos estáticos y el heap, mientras que cada proceso tiene su propio código, datos estáticos y heap. Igualmente cada thread tiene su propio stack, registros y program counter, ya que cada thread puede estar en un estado distinto de ejecución. Los threads también comparten los file descriptors y las señales.
 
